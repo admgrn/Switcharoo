@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html class="uk-height-1-1">
+    <head lang="en">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/uikit.css') }}" />
+        <script src="{{ url_for('static', filename='js/jquery-2.1.4.min.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/uikit.min.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/moment.min.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/jquery.validate.min.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/custom-0.1.js') }}"></script>
+        <script src="{{ url_for('static', filename='components/dist/vis.min.js') }}"></script>
+        <link href="{{ url_for('static', filename='components/dist/vis.min.css') }}" rel="stylesheet" type="text/css" />
+        <link href="{{ url_for('static', filename='css/custom-0.1.css') }}" rel="stylesheet" type="text/css" />
+        <meta charset="UTF-8">
+        <title>The Ole Reddit Switch-A-Roo - Beta</title>
+    </head>
+    <body class="uk-height-1-1">
+        <div id="wrapper" class="uk-height-1-1">
+            <nav class="uk-navbar">
+                <div class="uk-container uk-container-center uk-hidden-small">
+                    <div class="uk-navbar-flip">
+                        <ul class="uk-navbar-nav uk-hidden-small">
+                             {% macro navigation() %}
+                                <li><a href="http://knowyourmeme.com/memes/the-old-reddit-switch-a-roo"
+                                       target="_blank">About</a></li>
+                                <li><a data-uk-modal="{target:'#submit-a-roo-box', center: true}">Submit-A-Roo</a></li>
+                                <li><a data-uk-modal="{target:'#contact-box', center: true}">Contact</a></li>
+                            {% endmacro %}
+                            {{ navigation() }}
+                        </ul>
+                    </div>
+                    <div class="uk-navbar-brand">
+                        The Ole Reddit Switch-A-Roo <sup class="uk-text-small">beta</sup>
+                    </div>
+                </div>
+                <div class="uk-container uk-container-center uk-visible-small">
+                    <div class="uk-navbar-flip">
+                        <ul class="uk-navbar-nav">
+                            <li class="uk-parent" data-uk-dropdown>
+                                <a class="uk-navbar-toggle"></a>
+                                <div class="uk-dropdown uk-dropdown-navbar">
+                                    <ul class="uk-nav uk-nav-navbar">
+                                        {{ navigation() }}
+                                    </ul>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="uk-navbar-brand uk-navbar-center">
+                        Torsar <sup class="uk-text-small">beta</sup>
+                    </div>
+                </div>
+            </nav>
+            <div id="graph-navigator" class="uk-height-1-1"></div>
+        </div>
+        <div class="uk-align-right uk-container uk-text-small uk-text-muted uk-hidden-small uk-position-bottom-right">
+            {{ copyright | safe }}
+        </div>
+        <div class="uk-align-center uk-text-center uk-text-small uk-text-muted uk-visible-small uk-position-bottom">
+            {{ copyright | safe }}
+        </div>
+        <div id="contact-box" class="uk-modal">
+            <div class="uk-modal-dialog">
+                <a class="uk-modal-close uk-close"></a>
+                <div class="uk-modal-header">
+                    <h3>Contact</h3>
+                    <form class="async-form uk-form uk-display-inline-block uk-width-1-1">
+                        <h4>Please enter the following information.</h4>
+                        <div id="display-error-send_contact" style="display: none"
+                              class="uk-text-danger uk-margin-small-bottom">
+                            An error occurred, please try again.
+                        </div>
+                        <div class="uk-form-row">
+                            <input type="text" name="email" placeholder="email" email
+                                   class="uk-width-2-3 clear-done" required />
+                        </div>
+                        <div class="uk-form-row">
+                            <textarea placeholder="your message" name="message"
+                                     class="uk-width-1-1 clear-done" rows="6" required></textarea>
+
+                        </div>
+                        <div class="uk-form-row">
+                            <input type="hidden" value="send_contact" name="type" />
+                            <input type="submit" value="Send" class="uk-button submit-button" />
+                        </div>
+                    </form>
+                    <div class="submit-success-send_contact" style="display: none">
+                        <h5>Your message has been delivered!</h5>
+                        <h6 class="uk-margin-small-top">
+                            Thank you for helping us improve The Ole Reddit Switch-A-Roo.
+                        </h6>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="submit-a-roo-box" class="uk-modal">
+            <div class="uk-modal-dialog">
+                <a class="uk-modal-close uk-close"></a>
+                <div class="uk-modal-header">
+                    <h3>Submit-A-Roo</h3>
+                    <form class="async-form uk-form uk-display-inline-block uk-width-1-1">
+                        <h4>Have an additional link in the chain? Submit the link below to help us improve The Ole
+                            Reddit Switch-A-Roo.</h4>
+                        <div id="display-error-submit_roo" style="display: none"
+                              class="uk-text-danger uk-margin-small-bottom">
+                            An error occurred, please try again.
+                        </div>
+                        <div class="uk-form-row">
+                            <input type="text" name="link" placeholder="link" class="uk-width-3-4 clear-done"
+                                   required />
+                            <input type="hidden" value="submit_roo" name="type" />
+                            <input type="submit" value="Submit" class="uk-button uk-width-1-5 submit-button" />
+                        </div>
+                    </form>
+                    <div class="submit-success-submit_roo" style="display: none">
+                        <h5>Your link has been submitted!</h5>
+                        <h6 class="uk-margin-small-top">
+                            It will now be reviewed and if it passes inspection it will be
+                            added to the graph. Thank you for helping us improve The Ole Reddit Switch-A-Roo.
+                        </h6>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="left-canvas" class="uk-offcanvas">
+            <div class="uk-offcanvas-bar">
+                <div class="uk-panel" id="selected-content">
+                    <div class="info-wrapper">
+                        <div class="uk-float-left uk-display-inline">
+                            <a href="javascript:void(0)" id="username" target="_blank"></a>
+                        </div>
+                        <div class="uk-float-right uk-display-inline">
+                            <a href="javascript:void(0)" id="selected-link" target="_blank">Go-to-Roo</a>
+                        </div>
+                    </div>
+                        <div class="uk-panel-title" id="selected-info"></div>
+                    <blockquote>
+                        <span id="selected-html"></span>
+                    </blockquote>
+                    <div id="created-date"></div>
+                </div>
+                <div class="uk-panel" id="loading-content">
+                    <div class="uk-text-center uk-block">
+                        <div class="loading-top">
+                            <i class="uk-icon-spinner uk-icon-spin uk-icon-large"></i>
+                        </div>
+                        <div class="loading-bottom">
+                            Loading...
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script type="text/javascript">
+            {% set x=0 %}
+            {% set y=0 %}
+            var nodes = new vis.DataSet([
+            {% for node in nodes %}{id: {{nodes[node].id}}, label: {{ nodes[node].title }}, x: {{nodes[node].x}}, y: {{nodes[node].y}}},
+            {% endfor %}
+            ]);
+            var edges = new vis.DataSet([
+            {% for rel in relations %}{from: {{relations[rel].from}}, to: {{relations[rel].to}} },
+            {% endfor %}
+            ]);
+            // create a network
+            var container = document.getElementById('graph-navigator');
+            var data = {
+                nodes: nodes,
+                edges: edges
+            };
+            var options = {
+                edges: {
+                    arrows: {
+                        to: {
+                            enabled: true,
+                            scaleFactor: 0.5
+                        }
+                    },
+                    smooth: {
+                        enabled: false
+                    },
+                    color: 'rgb(100,100,100)'
+                },
+                nodes: {
+                    borderWidth: 0.8,
+                    shape: 'circle'
+                },
+                layout: {
+                    randomSeed: 1
+                },
+                physics: {
+                    enabled: true,
+                    stabilization: false,
+                    barnesHut: {
+                        centralGravity: 0,
+                        springConstant: 0,
+                        springLength: 0,
+                        avoidOverlap: 1,
+                        damping: 0.3
+                    }
+                }
+            };
+            var network = new vis.Network(container, data, options);
+            network.on('selectNode', showInfo);
+        </script>
+    </body>
+</html>

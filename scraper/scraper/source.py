@@ -27,10 +27,10 @@ class Source:
         size = self.t.queue.qsize()
         submissions = self.t.reddit.get_subreddit('switcharoo').get_hot(limit=limit)
         for submission in submissions:
-            try:
+            if submission.link_flair_text != 'meta':
                 self.t.queue.put(submission.url)
-            except:
-                pass
+            else:
+                self.t.events.on_skipping_url(submission.url)
         return self.t.queue.qsize() > size
 
     def add_to_queue(self, limit):

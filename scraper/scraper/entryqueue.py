@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Switcharoo Cartographer.  If not, see <http://www.gnu.org/licenses/>.
 
-from data import Access, Entry
+from data import Access, Entry, EntryError
 from Queue import Queue
 
 
@@ -29,16 +29,20 @@ class EntryQueue(Queue):
         for node in nodes:
             try:
                 self.queue.append(Entry(node['raw_url'], self.reddit))
-            except:
+                self.events.on_adding_to_queue(node['raw_url'])
+            except EntryError:
                 # TODO Remove old entry from DB
                 pass
 
     def _put(self, url):
-        entry = Entry(url, self.reddit)
-        if self._is_unique(entry):
-            self.events.on_adding_to_queue(url)
-            self.queue.append(entry)
-        else:
+        try:
+            entry = Entry(url, self.reddit)
+            if self._is_unique(entry):
+                self.events.on_adding_to_queue(url)
+                self.queue.append(entry)
+            else:
+                self.events.on_not_adding_to_queue(url)
+        except EntryError:
             self.events.on_not_adding_to_queue(url)
 
     def _get(self):

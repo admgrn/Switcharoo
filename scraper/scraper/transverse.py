@@ -24,9 +24,14 @@ class Transverse:
     def __init__(self, events):
         self.reddit = praw.Reddit(user_agent='Switcharoo Cartographer v.0.1.1')
         self.events = events
-        self.queue = EntryQueue(self)
+        self.queue = None
         self.data = Access(self.events)
         self.source = Source(self)
+        self._should_stop = False
+
+    def init_queue(self):
+        if self.queue is None:
+            self.queue = EntryQueue(self)
 
     def build_graph(self, current_entry):
         entry_point = True

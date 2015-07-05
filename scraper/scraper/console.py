@@ -13,13 +13,16 @@
 # You should have received a copy of the GNU General Public License
 # along with Switcharoo Cartographer.  If not, see <http://www.gnu.org/licenses/>.
 
+from threading import Thread
 
 class ConsoleManager:
-    def __init__(self):
+    def __init__(self, transverse):
         self._methods = {}
         self._help = lambda x: ()
+        self.transverse = transverse
+        self.op = None
 
-    def register(self, name, description="No description"):
+    def register(self, name, description='No description'):
         def func(fn):
             self._methods[name] = (fn, description)
             return fn
@@ -30,18 +33,24 @@ class ConsoleManager:
         return fn
 
     def console_loop(self):
-        while 1:
-            prompt_input = raw_input('Enter command or help >>> ')
-            if prompt_input == 'help':
-                self._help([(k, self._methods[k][1]) for k in self._methods])
-            elif prompt_input == 'exit':
-                break
-            else:
-                inputs = prompt_input.split()
-                if len(inputs) > 1:
-                    self._call(inputs[0], inputs[1:])
+        try:
+            while 1:
+                prompt_input = raw_input('Enter command or help >>> ')
+                if prompt_input == 'help':
+                    self._help([(k, self._methods[k][1]) for k in self._methods])
+                elif prompt_input == 'exit':
+                    break
                 else:
-                    self._call(inputs[0])
+                    inputs = prompt_input.split()
+                    if len(inputs) == 0:
+                        continue
+                    elif len(inputs) > 1:
+                        self._call(inputs[0], inputs[1:])
+                    else:
+                        self._call(inputs[0])
+                        self.op = Thread(target=self._call, args=(inputs[0],))
+        except KeyboardInterrupt:
+            pass
 
     def _call(self, name, args=[]):
         try:
@@ -53,3 +62,5 @@ class ConsoleManager:
             print ' > The command \'' + name + '\' does not take ' + str(len(args)) + ' arguments.'
         except KeyError:
             print ' > The command \'' + name + '\' does not exist.'
+        except KeyboardInterrupt:
+            pass

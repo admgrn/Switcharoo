@@ -1,3 +1,5 @@
+#! /usr/bin/python
+#
 # Copyright 2015 Adam Greenstein <adamgreenstein@comcast.net>
 #
 # Switcharoo Cartographer is free software: you can redistribute it and/or modify
@@ -13,18 +15,19 @@
 # You should have received a copy of the GNU General Public License
 # along with Switcharoo Cartographer.  If not, see <http://www.gnu.org/licenses/>.
 
+from manage import cache
 from scraper.console import ConsoleManager
 from scraper.events import EventsBase
 from scraper.reconnect import Connections
 from scraper.transverse import Transverse
 
 events = EventsBase()
-manager = ConsoleManager()
 transverse = Transverse(events)
+manager = ConsoleManager(transverse)
 connection = Connections(transverse)
 
 
-@manager.register("extend_all", "usage: extend_all")
+@manager.register('extend_all', 'usage: extend_all')
 def link_terminus():
     while 1:
         nodes = connection.get_terminus()
@@ -40,30 +43,40 @@ def link_terminus():
         connection.extend_terminus()
 
 
-@manager.register("create_rel", "usage: create_rel")
+@manager.register('create_rel', 'usage: create_rel')
 def create_relationship():
     parent = raw_input('  Enter parent URL: ').strip()
     child = raw_input('  Enter child URL: ').strip()
     try:
         connection.create_url_relationship(parent, child)
-        print "  Success"
-    except:
-        print "  An error occurred. Please try again."
+        print '  Success'
+    except TypeError:
+        print '  An error occurred. Please try again.'
 
 
-@manager.register("scrape", "usage: scrape <limit>")
+@manager.register('scrape', 'usage: scrape <limit>')
 def scrape(limit=10):
+    transverse.init_queue()
     limit = int(limit)
     transverse.loop(limit)
+
+
+@manager.register('clear_cache', 'usage: clear_cache')
+def clear_cache():
+    print 'Clearing'
+    if cache.clear_cache():
+        print 'Success'
+    else:
+        print 'Unsuccessful'
 
 
 @manager.help
 def helper(methods):
     for method in methods:
-        print "\n  " + method[0]
-        print "     - " + method[1]
-    print "\n  exit"
-    print "     - usage: exit\n"
+        print '\n  ' + method[0]
+        print '     - ' + method[1]
+    print '\n  exit'
+    print '     - usage: exit\n'
 
-
+# Entry point
 manager.console_loop()

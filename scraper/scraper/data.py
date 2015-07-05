@@ -46,17 +46,19 @@ def transverse_tree(comments):
         try:
             return get_url(comment.body)
         except:
-            found = transverse_tree(comment.replies)
+            try:
+                found = transverse_tree(comment.replies)
+            except AttributeError:
+                continue
             if found:
                 return found
     return None
 
 
 class Access:
-    def __init__(self, events):
+    def __init__(self, events, config_file='./config.ini'):
         config = ConfigParser.ConfigParser()
-        config.read('./config.ini')
-        config.sections()
+        config.read(config_file)
         authenticate(config.get('db', 'host'), config.get('db', 'username'), config.get('db', 'password'))
         self.graph = Graph()
         self.events = events
@@ -84,7 +86,8 @@ class Access:
             self.events.on_creating_node()
             node = Node('node', clean_url=entry.clean_url, raw_url=entry.raw_url, context=entry.context,
                         next_id=next_id, self_id=entry.id, created=entry.created, created_utc=entry.created_utc,
-                        source=entry.source_comment, html=entry.html_comment, title=entry.title, user=entry.user)
+                        source=entry.source_comment, html=entry.html_comment, title=entry.title, user=entry.user,
+                        submission_id=entry.submission_id)
             self.graph.create(node)
             return node, False
         else:
@@ -126,17 +129,6 @@ class Access:
         return results.to_subgraph().nodes
 
     @staticmethod
-    def set_extra_data(node, entry):
-        node['created'] = entry.created
-        node['created_utc'] = entry.created_utc
-        node['source'] = entry.source_comment
-        node['html'] = entry.html_comment
-        node['title'] = entry.title
-        node['user'] = entry.user
-        node['updated'] = 1
-        node.push()
-
-    @staticmethod
     def set_terminus(node):
         node['broken'] = True
         node.push()
@@ -149,38 +141,46 @@ class Access:
 
 class Entry:
     def __init__(self, url, reddit):
-        self.reddit = reddit
-        if len(re.findall(r'.*reddit.com/.*comments/.*', url)) <= 0:
-            raise Exception()
-        fixed_url = re.sub(r'(^https?://(www.)?)', 'http://www.', url)
-        clean = re.findall(r'.*?(?=\?|/\?|/$|$)', fixed_url)
-        context = re.findall(r'(?<=\?context=)\d+', fixed_url)
-        self.raw_url = url
         try:
-            if len(context) == 1:
-                self.context = int(context[0])
-            else:
+            self.reddit = reddit
+            if len(re.findall(r'.*reddit.com/.*comments/.*', url)) <= 0:
+                raise EntryError()
+            fixed_url = re.sub(r'(^https?://(www.)?)', 'http://www.', url)
+            clean = re.findall(r'.*?(?=\?|/\?|/$|$)', fixed_url)
+            context = re.findall(r'(?<=\?context=)\d+', fixed_url)
+            self.raw_url = url
+            try:
+                if len(context) == 1:
+                    self.context = int(context[0])
+                else:
+                    self.context = 0
+            except ValueError:
                 self.context = 0
+            self.clean_url = clean[0] + '/'
+            self.full_url = clean[0] + '?context=' + str(self.context)
+            self.comment = reddit.get_submission(self.clean_url).comments[0]
+            self.source_comment = self.comment.body
+            self.html_comment = self.comment.body_html
+            self.title = self.comment.submission.title
+            if self.comment.author:
+                self.user = self.comment.author.name
+            else:
+                self.user = None
+            self.created = self.comment.created
+            self.created_utc = self.comment.created_utc
+            self.id = self.comment.submission.id + ':' + self.comment.id
+            self.submission_id = self.comment.submission.fullname
+            self.next_entry = None
         except:
-            self.context = 0
-        self.clean_url = clean[0] + '/'
-        self.full_url = clean[0] + '?context=' + str(self.context)
-        self.comment = reddit.get_submission(self.clean_url).comments[0]
-        self.source_comment = self.comment.body
-        self.html_comment = self.comment.body_html
-        self.title = self.comment.submission.title
-        if self.comment.author:
-            self.user = self.comment.author.name
-        else:
-            self.user = None
-        self.created = self.comment.created
-        self.created_utc = self.comment.created_utc
-        self.id = self.comment.submission.id + ':' + self.comment.id
-        self.next_entry = None
+            raise EntryError
 
     def set_next(self):
         try:
             comment = self.reddit.get_submission(self.full_url).comments
             self.next_entry = Entry(transverse_tree(comment), self.reddit)
-        except:
+        except EntryError:
             pass
+
+
+class EntryError(Exception):
+    pass
