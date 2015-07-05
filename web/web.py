@@ -147,5 +147,5 @@ def submit_roo():
     return Response(response=resp, status=200)
 
 if __name__ == '__main__':
-    CacheManager(get_data)
+    CacheManager(get_data).run()
     app.run()
