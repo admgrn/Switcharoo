@@ -33,14 +33,13 @@ class Source:
                 self.t.events.on_skipping_url(submission.url)
         return self.t.queue.qsize() > size
 
-    def add_to_queue(self, limit):
-        seconds = 10
+    def add_to_queue(self, limit, sleep=10):
         try:
             current_entry = self.t.queue.get_nowait()
         except Empty:
             while not self.get_new_submissions(limit):
-                self.t.events.waiting(seconds)
-                time.sleep(seconds)
+                self.t.events.waiting(sleep)
+                time.sleep(sleep)
             current_entry = self.t.queue.get_nowait()
         self.t.events.using_url(current_entry.raw_url)
         return current_entry

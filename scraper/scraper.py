@@ -54,11 +54,12 @@ def create_relationship():
         print '  An error occurred. Please try again.'
 
 
-@manager.register('scrape', 'usage: scrape <limit>')
-def scrape(limit=10):
+@manager.register('scrape', 'usage: scrape <op:limit> <op:sleep>')
+def scrape(limit=10, sleep=10):
     transverse.init_queue()
     limit = int(limit)
-    transverse.loop(limit)
+    sleep = int(sleep)
+    transverse.loop(limit, sleep)
 
 
 @manager.register('clear_cache', 'usage: clear_cache')

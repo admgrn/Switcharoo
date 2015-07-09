@@ -10,12 +10,12 @@ var ContentLoading = {
 };
 var FormSuccess = {
     show: function (location) {
-        $('.submit-success-' + $(location).children('input[name="type"]').val()).css('display','');
+        $('.submit-success-' + $(location).find('input[name=type]').val()).css('display','');
         $(location).removeClass('uk-display-inline-block');
         $(location).css('display', 'none');
     },
     hide: function (location) {
-        $('.submit-success-' + $(location).children('input[name="type"]').val()).css('display','none');
+        $('.submit-success-' + $(location).find('input[name=type]').val()).css('display','none');
         $(location).addClass('uk-display-inline-block');
         $(location).css('display', '');
     }
@@ -73,8 +73,8 @@ $(function () {
                 $(element).removeClass('uk-form-danger');
             },
             submitHandler: function (form) {
-                $(form).children('.submit-button').attr('disabled', 'disabled');
-                var name = $(form).children('input[name="type"]').val();
+                $(form).find('.submit-button').attr('disabled', 'disabled');
+                var name = $(form).find('input[name=type]').val();
                 var location = '/api/' + name + '/';
                 var formData = $(form).serialize();
                 $.post(location, formData, function (resp) {
@@ -86,14 +86,14 @@ $(function () {
                     }
                 })
                 .always(function () {
-                    $(form).children('.submit-button').removeAttr('disabled');
+                    $(form).find('.submit-button').removeAttr('disabled');
                 });
                 return false;
             }
         });
     });
     $('.uk-modal').on('hide.uk.modal', function () {
-        $(this).find('[id^="display-error-"]').css('display', 'none');
+        $(this).find('[id^=display-error-]').css('display', 'none');
         FormSuccess.hide($(this).find('.async-form'));
     });
 });

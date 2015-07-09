@@ -103,7 +103,7 @@ def get_data():
 def index():
     nodes, relations = get_data()
     year = datetime.date.today().year
-    copy = '&copy; ' + str(year) + '. The Ole Reddit Switch-A-Roo. All Rights Reserved.'
+    copy = '&copy; ' + str(year) + '. RooGraph. All Rights Reserved.'
     return render_template('index.html', nodes=nodes, relations=relations,
                            copyright=copy)
 

@@ -54,7 +54,7 @@ class Transverse:
             self.source.mark_searched(current_entry)
             current_entry = current_entry.next_entry
 
-    def loop(self, limit):
+    def loop(self, limit, sleep=10):
         while 1:
-            current_entry = self.source.add_to_queue(limit)
+            current_entry = self.source.add_to_queue(limit, sleep)
             self.build_graph(current_entry)
