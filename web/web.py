@@ -114,6 +114,7 @@ def get_info(ident):
     return jsonify(title=node['a']['title'], link=node['a']['raw_url'], html=node['a']['html'],
                    user=node['a']['user'], date=node['a']['created_utc'])
 
+
 @app.route(app.config['CONTACT_URL'], methods=('POST',))
 def send_message():
     try:
