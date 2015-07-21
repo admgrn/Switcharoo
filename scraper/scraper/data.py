@@ -171,6 +171,8 @@ class Entry:
             self.id = self.comment.submission.id + ':' + self.comment.id
             self.submission_id = self.comment.submission.fullname
             self.next_entry = None
+        except KeyboardInterrupt:
+            raise KeyboardInterrupt
         except:
             raise EntryError
 

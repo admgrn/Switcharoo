@@ -1,15 +1,25 @@
 <!DOCTYPE html>
 <html class="uk-height-1-1">
     <head lang="en">
-        <link rel="stylesheet" href="{{ url_for('static', filename='css/uikit.css') }}" />
+        <script>
+          (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+          (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+          })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+          ga('create', 'UA-65369919-1', 'auto');
+          ga('send', 'pageview');
+        </script>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href="{{ url_for('static', filename='components/dist/vis.min.css') }}" rel="stylesheet" type="text/css" />
+        <link href="{{ url_for('static', filename='css/custom-0.1.css') }}" rel="stylesheet" type="text/css" />
+        <link href="{{ url_for('static', filename='css/uikit.css') }}" rel="stylesheet" type="text/css" />
         <script src="{{ url_for('static', filename='js/jquery-2.1.4.min.js') }}"></script>
         <script src="{{ url_for('static', filename='js/uikit.min.js') }}"></script>
         <script src="{{ url_for('static', filename='js/moment.min.js') }}"></script>
         <script src="{{ url_for('static', filename='js/jquery.validate.min.js') }}"></script>
         <script src="{{ url_for('static', filename='js/custom-0.1.js') }}"></script>
         <script src="{{ url_for('static', filename='components/dist/vis.min.js') }}"></script>
-        <link href="{{ url_for('static', filename='components/dist/vis.min.css') }}" rel="stylesheet" type="text/css" />
-        <link href="{{ url_for('static', filename='css/custom-0.1.css') }}" rel="stylesheet" type="text/css" />
         <meta charset="UTF-8">
         <title>RooGraph - Beta</title>
     </head>

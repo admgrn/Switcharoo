@@ -10,7 +10,6 @@ from tools.cachemanager import CacheManager
 from validate_email import validate_email
 
 app = Flask(__name__)
-
 app.config.from_pyfile('config.ini')
 
 authenticate(app.config['HOST'], app.config['USERNAME'], app.config['PASSWORD'])
@@ -147,6 +146,7 @@ def submit_roo():
         graph.create(node)
     return Response(response=resp, status=200)
 
+CacheManager(get_data).run()
+
 if __name__ == '__main__':
-    CacheManager(get_data).run()
     app.run()
