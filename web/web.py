@@ -95,23 +95,30 @@ def get_data():
                         prev_node = None
                     else:
                         prev_node = ids[i]
-    return nodes, relations
+    node_list = [{'id': x['id'], 'label': x['title'], 'x': x['x'], 'y': x['y']} for _, x in nodes.iteritems()]
+    rel_list = [{'from': x['from'], 'to': x['to']} for _, x in relations.iteritems()]
+    return node_list, rel_list
 
 
 @app.route('/')
-def index():
-    nodes, relations = get_data()
+@app.route('/location/<id>')
+def index(id=None):
     year = datetime.date.today().year
     copy = '&copy; ' + str(year) + '. RooGraph. All Rights Reserved.'
-    return render_template('index.html', nodes=nodes, relations=relations,
-                           copyright=copy)
+    return render_template('index.html', copyright=copy)
+
+
+@app.route('/load_content')
+def load_content():
+    nodes, relations = get_data()
+    return jsonify(nodes=nodes, relations=relations)
 
 
 @app.route('/get_info/<ident>')
 def get_info(ident):
     node = graph.cypher.execute('MATCH (a:node) WHERE id(a) = {ID} RETURN a', ID=int(ident))[0]
     return jsonify(title=node['a']['title'], link=node['a']['raw_url'], html=node['a']['html'],
-                   user=node['a']['user'], date=node['a']['created_utc'])
+                   user=node['a']['user'], date=node['a']['created_utc'], id=ident)
 
 
 @app.route(app.config['CONTACT_URL'], methods=('POST',))

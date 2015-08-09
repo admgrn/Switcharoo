@@ -12,18 +12,25 @@
         </script>
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link href="{{ url_for('static', filename='components/dist/vis.min.css') }}" rel="stylesheet" type="text/css" />
-        <link href="{{ url_for('static', filename='css/custom-0.1.css') }}" rel="stylesheet" type="text/css" />
+        <link href="{{ url_for('static', filename='css/custom-0.2.css') }}" rel="stylesheet" type="text/css" />
         <link href="{{ url_for('static', filename='css/uikit.css') }}" rel="stylesheet" type="text/css" />
         <script src="{{ url_for('static', filename='js/jquery-2.1.4.min.js') }}"></script>
         <script src="{{ url_for('static', filename='js/uikit.min.js') }}"></script>
         <script src="{{ url_for('static', filename='js/moment.min.js') }}"></script>
         <script src="{{ url_for('static', filename='js/jquery.validate.min.js') }}"></script>
-        <script src="{{ url_for('static', filename='js/custom-0.1.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/custom-0.2.js') }}"></script>
         <script src="{{ url_for('static', filename='components/dist/vis.min.js') }}"></script>
         <meta charset="UTF-8">
         <title>RooGraph - Beta</title>
     </head>
     <body class="uk-height-1-1">
+        <div class="uk-position-cover uk-flex uk-flex-center uk-flex-middle" id="loading-main">
+            <div class="uk-text-center uk-block">
+                <div class="loading-main-top">
+                    <i class="uk-icon-spinner uk-icon-spin uk-icon-large"></i>
+                </div>
+            </div>
+        </div>
         <div id="wrapper" class="uk-height-1-1">
             <nav class="uk-navbar">
                 <div class="uk-container uk-container-center uk-hidden-small">
@@ -160,16 +167,9 @@
             </div>
         </div>
         <script type="text/javascript">
-            {% set x=0 %}
-            {% set y=0 %}
-            var nodes = new vis.DataSet([
-            {% for node in nodes %}{id: {{nodes[node].id}}, label: {{ nodes[node].title }}, x: {{nodes[node].x}}, y: {{nodes[node].y}}},
-            {% endfor %}
-            ]);
-            var edges = new vis.DataSet([
-            {% for rel in relations %}{from: {{relations[rel].from}}, to: {{relations[rel].to}} },
-            {% endfor %}
-            ]);
+            var nodes = new vis.DataSet();
+            var edges = new vis.DataSet();
+
             // create a network
             var container = document.getElementById('graph-navigator');
             var data = {
@@ -181,7 +181,7 @@
                     arrows: {
                         to: {
                             enabled: true,
-                            scaleFactor: 0.5
+                            scaleFactor: 2.5
                         }
                     },
                     smooth: {
@@ -191,7 +191,13 @@
                 },
                 nodes: {
                     borderWidth: 0.8,
-                    shape: 'circle'
+                    shape: 'circle',
+                    font: {
+                        size: 50
+                    },
+                    scaling : {
+                        min: 300
+                    }
                 },
                 layout: {
                     randomSeed: 1
@@ -209,7 +215,42 @@
                 }
             };
             var network = new vis.Network(container, data, options);
-            network.on('selectNode', showInfo);
+            network.on('selectNode', function (e) {
+                showInfo(e, true);
+                network.selectNodes([e.nodes[0]], true);
+                network.focus(e.nodes[0], {
+                    animation: {
+                        duration: 200
+                    },
+                    offset: {
+                        x: -offset
+                    }
+                });
+            });
+            $(window).load(function () {
+                $.ajax('/load_content')
+                    .done(function (content) {
+                            nodes.add(content['nodes']);
+                            edges.add(content['relations']);
+                            var id;
+                            if ((id = checkUrl()) !== null) {
+                                showInfo(id);
+                                state('/location/' + id, id, true);
+                                network.selectNodes([id], true);
+                                network.focus(id,  {
+                                    animation: {
+                                        duration: 200
+                                    },
+                                    offset: {
+                                        x: -offset
+                                    }
+                                });
+                            } else {
+                                network.fit();
+                            }
+                            $('#loading-main').hide()
+                    });
+            });
         </script>
     </body>
 </html>

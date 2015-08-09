@@ -1,3 +1,4 @@
+var push = true;
 var ContentLoading = {
     show: function () {
         $('#loading-content').show();
@@ -8,6 +9,7 @@ var ContentLoading = {
         $('#selected-content').show();
     }
 };
+var offset = 350 / 2;
 var FormSuccess = {
     show: function (location) {
         $('.submit-success-' + $(location).find('input[name=type]').val()).css('display','');
@@ -32,9 +34,16 @@ function getTime(timestamp) {
 function displayError(id) {
     $('#display-error-' + id).css('display', '')
 }
-function showInfo(params) {
+function state(location, id, replace) {
+    if (!replace)
+        history.pushState({loc: location, id: id}, '', location);
+    else
+        history.replaceState({loc: location, id: id}, '', location);
+}
+function showInfo(params, updateState) {
+    var id = typeof params === 'number' ? params : params.nodes[0];
     ContentLoading.show();
-    $.ajax('/get_info/' + params.nodes[0])
+    $.ajax('/get_info/' + id)
             .done(function (data) {
                 $('#selected-info').text(data.title);
                 $('#selected-link').attr('href', data.link);
@@ -50,8 +59,16 @@ function showInfo(params) {
                                   .attr('href', 'javascript:void(0)');
                 $('#created-date').text('Submitted: ' + getTime(data.date));
                 ContentLoading.hide();
+                if (updateState)
+                    state('/location/' + data.id, data.id);
             });
     UIkit.offcanvas.show('#left-canvas');
+}
+function checkUrl() {
+    var id;
+    if ((id = window.location.href.match(/\/location\/(\d+)/)) !== null)
+        id = parseInt(id[1]);
+    return id;
 }
 $(function () {
     $('.async-form').each(function () {
@@ -95,5 +112,37 @@ $(function () {
     $('.uk-modal').on('hide.uk.modal', function () {
         $(this).find('[id^=display-error-]').css('display', 'none');
         FormSuccess.hide($(this).find('.async-form'));
+    });
+    $('#left-canvas').on('hide.uk.offcanvas', function () {
+        network.moveTo({
+            offset: {
+                x: offset
+            },
+            animation: {
+                duration: 100
+            }
+        });
+        if (push)
+            state('/');
+        else
+            push = true;
+    });
+    $(window).on('popstate', function (e) {
+        if (e.originalEvent.state.id) {
+            var id = parseInt(e.originalEvent.state.id);
+            showInfo(id);
+            network.selectNodes([id], true);
+            network.focus(id, {
+                animation: {
+                    duration: 200
+                },
+                offset: {
+                    x: -offset
+                }
+            });
+        } else {
+            push = false;
+            UIkit.offcanvas.hide();
+        }
     });
 });
