@@ -1,0 +1,38 @@
+#! /usr/bin/python
+#
+# Copyright 2015 Adam Greenstein <adamgreenstein@comcast.net>
+# 
+# node_server is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# node_server is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with node_server.  If not, see <http://www.gnu.org/licenses/>.
+
+from multiprocessing.managers import BaseManager
+from utils.generator import GraphBuilder
+from utils.manager import CacheManager
+
+gb = GraphBuilder('./config.ini')
+graph = gb.get_data()
+
+def get_cache():
+    return graph
+
+def reload_cache():
+    global graph
+    temp = gb.get_data()
+    graph = temp
+
+cache_loader = CacheManager(reload_cache)
+cache_loader.run()
+manager = BaseManager(address=('', gb.port), authkey=gb.auth)
+manager.register('get_cache', callable=get_cache, exposed=('__getitem__',))
+manager.get_server().serve_forever()
+

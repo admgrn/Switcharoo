@@ -28,7 +28,10 @@ class EventsBase(object):
         print 'Skipping ' + url + ' not adding to queue.'
 
     def waiting(self, seconds):
-        print 'Wating ' + str(seconds) + ' seconds for new submissions...'
+        print 'Waiting ' + str(seconds) + ' seconds for new submissions...'
+
+    def on_clearing_cache(self):
+        print "Clearing Cache"
 
     def using_url(self, url):
         print 'Using ' + url

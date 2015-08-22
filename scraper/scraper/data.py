@@ -100,8 +100,11 @@ class Access:
         return results.to_subgraph().nodes
 
     def add_link(self, parent, child):
+        if len(list(self.graph.match(start_node=parent, end_node=child, rel_type='linksTo'))) > 0:
+            return False
         rel = Relationship(parent, 'linksTo', child)
         self.graph.create_unique(rel)
+        return True
 
     def get_terminus(self, limit=100):
         stmt = 'MATCH (a:node) WHERE NOT (a)-[:linksTo]->() and (not has(a.broken) or a.broken = false) ' + \

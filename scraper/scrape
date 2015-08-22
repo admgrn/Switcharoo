@@ -15,6 +15,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Switcharoo Cartographer.  If not, see <http://www.gnu.org/licenses/>.
 
+from sys import argv
+
 from manage import cache
 from scraper.console import ConsoleManager
 from scraper.events import EventsBase
@@ -55,7 +57,7 @@ def create_relationship():
 
 
 @manager.register('scrape', 'usage: scrape <op:limit> <op:sleep>')
-def scrape(limit=10, sleep=10):
+def scrape(limit=10, sleep=600):
     transverse.init_queue()
     limit = int(limit)
     sleep = int(sleep)
@@ -80,4 +82,7 @@ def helper(methods):
     print '     - usage: exit\n'
 
 # Entry point
-manager.console_loop()
+if len(argv) <= 1:
+    manager.console_loop()
+else:
+    manager.direct_call(argv[1:])

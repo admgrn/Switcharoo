@@ -12,39 +12,15 @@
 
 # You should have received a copy of the GNU General Public License
 # along with web.  If not, see <http://www.gnu.org/licenses/>.
+from multiprocessing.managers import BaseManager
 
-from beaker.cache import region_invalidate
-from socket import socket
-from threading import Thread
+class CacheClient:
+    def __init__(self, port, auth):
+        self.port = port
+        self.auth = auth
 
-class CacheManager:
-    def __init__(self, namespace):
-        self.server = None
-        self.t = None
-        self.namespace = namespace
-
-    def _reload_cache(self):
-        region_invalidate(self.namespace, 'short_term', 'load_nodes')
-        self.namespace()
-
-    def _loop(self):
-        self.server = socket()
-        self.server.bind(('localhost', 5891))
-        self.server.listen(1)
-        while 1:
-            connection, address = self.server.accept()
-            value = connection.recv(32)
-            if value.strip() == 'clear':
-                self._reload_cache()
-                connection.send('cleared')
-            connection.close()
-
-    def run(self):
-        self.t = Thread(target=self._loop)
-        self.t.start()
-
-    def kill(self):
-        if self.server:
-            self.server.close()
-        if self.t:
-            self.t.kill()
+    def get_cache(self):
+        manager = BaseManager(address=('', self.port), authkey=self.auth)
+        manager.register('get_cache')
+        manager.connect()
+        return manager.get_cache()

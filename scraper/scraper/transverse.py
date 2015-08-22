@@ -17,6 +17,7 @@ import praw
 
 from data import Access
 from entryqueue import EntryQueue
+from manage.cache import clear_cache
 from source import Source
 
 
@@ -36,6 +37,7 @@ class Transverse:
     def build_graph(self, current_entry):
         entry_point = True
         stop = False
+        found = False
         while current_entry is not None and not stop:
             current_entry.set_next()
             if current_entry.next_entry is None and entry_point:
@@ -48,13 +50,20 @@ class Transverse:
                 self.source.mark_searched(current_entry)
                 return
             # New node
+            if not stop:
+                found = True
             parents = self.data.get_parents(current_entry)
             for parent in parents:
-                self.data.add_link(parent, node)
+                created = self.data.add_link(parent, node)
+                if created:
+                    found = True
             self.source.mark_searched(current_entry)
             current_entry = current_entry.next_entry
+        return found
 
     def loop(self, limit, sleep=10):
         while 1:
             current_entry = self.source.add_to_queue(limit, sleep)
-            self.build_graph(current_entry)
+            if self.build_graph(current_entry):
+                self.events.on_clearing_cache()
+                clear_cache()

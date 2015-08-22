@@ -21,6 +21,7 @@ class ConsoleManager:
         self._help = lambda x: ()
         self.transverse = transverse
         self.op = None
+        self._help_fn = "help"
 
     def register(self, name, description='No description'):
         def func(fn):
@@ -36,8 +37,8 @@ class ConsoleManager:
         try:
             while 1:
                 prompt_input = raw_input('Enter command or help >>> ')
-                if prompt_input == 'help':
-                    self._help([(k, self._methods[k][1]) for k in self._methods])
+                if prompt_input == self._help_fn:
+                    self._help(self._help_methods())
                 elif prompt_input == 'exit':
                     break
                 else:
@@ -52,6 +53,15 @@ class ConsoleManager:
         except KeyboardInterrupt:
             pass
 
+    def direct_call(self, argv):
+        if len(argv) == 1:
+            if argv[0] == self._help_fn:
+                self._help(self._help_methods())
+            else:
+                self._call(argv[0])
+        else:
+            self._call(argv[0], argv[1:])
+
     def _call(self, name, args=[]):
         try:
             if len(args) > 0:
@@ -64,3 +74,6 @@ class ConsoleManager:
             print ' > The command \'' + name + '\' does not exist.'
         except KeyboardInterrupt:
             pass
+
+    def _help_methods(self):
+        return [(k, self._methods[k][1]) for k in self._methods]
