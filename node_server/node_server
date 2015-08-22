@@ -35,4 +35,3 @@ cache_loader.run()
 manager = BaseManager(address=('', gb.port), authkey=gb.auth)
 manager.register('get_cache', callable=get_cache, exposed=('__getitem__',))
 manager.get_server().serve_forever()
-
