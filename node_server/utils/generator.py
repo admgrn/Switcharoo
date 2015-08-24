@@ -75,6 +75,8 @@ class GraphBuilder:
         if len(found_paths):
             for path in found_paths:
                 ids = path['id']
+                if ids[0] != 2656:
+                    continue
                 path_size = path['le']
                 if path_size > 0:
                     relation = {}
