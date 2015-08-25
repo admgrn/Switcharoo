@@ -15,3 +15,10 @@
 .error {
     display: block;
 }
+.nav-position {
+    position: fixed;
+    width: 100%;
+}
+.nav-padding {
+    padding-top: 40px;
+}

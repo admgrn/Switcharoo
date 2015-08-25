@@ -12,13 +12,13 @@
         </script>
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link href="{{ url_for('static', filename='components/dist/vis.min.css') }}" rel="stylesheet" type="text/css" />
-        <link href="{{ url_for('static', filename='css/custom-0.2.css') }}" rel="stylesheet" type="text/css" />
+        <link href="{{ url_for('static', filename='css/custom-0.3.css') }}" rel="stylesheet" type="text/css" />
         <link href="{{ url_for('static', filename='css/uikit.css') }}" rel="stylesheet" type="text/css" />
         <script src="{{ url_for('static', filename='js/jquery-2.1.4.min.js') }}"></script>
         <script src="{{ url_for('static', filename='js/uikit.min.js') }}"></script>
         <script src="{{ url_for('static', filename='js/moment.min.js') }}"></script>
         <script src="{{ url_for('static', filename='js/jquery.validate.min.js') }}"></script>
-        <script src="{{ url_for('static', filename='js/custom-0.2.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/custom-0.3.js') }}"></script>
         <script src="{{ url_for('static', filename='components/dist/vis.min.js') }}"></script>
         <meta charset="UTF-8">
         <title>RooGraph - Beta</title>
@@ -32,7 +32,7 @@
             </div>
         </div>
         <div id="wrapper" class="uk-height-1-1">
-            <nav class="uk-navbar">
+            <nav class="uk-navbar nav-position">
                 <div class="uk-container uk-container-center uk-hidden-small">
                     <div class="uk-navbar-flip">
                         <ul class="uk-navbar-nav uk-hidden-small">
@@ -67,7 +67,7 @@
                     </div>
                 </div>
             </nav>
-            <div id="graph-navigator" class="uk-height-1-1"></div>
+            <div id="graph-navigator" class="uk-height-1-1 nav-padding"></div>
         </div>
         <div class="uk-align-right uk-container uk-text-small uk-text-muted uk-hidden-small uk-position-bottom-right">
             {{ copyright | safe }}
