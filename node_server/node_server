@@ -32,7 +32,7 @@ def reload_cache():
     print "Reloading Cache..."
     graph = temp
 
-cache_loader = CacheManager(reload_cache)
+cache_loader = CacheManager(reload_cache, gb.com_port)
 cache_loader.run()
 manager = BaseManager(address=('', gb.port), authkey=gb.auth)
 manager.register('get_cache', callable=get_cache, exposed=('__getitem__',))

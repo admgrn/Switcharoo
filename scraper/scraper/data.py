@@ -62,6 +62,7 @@ class Access:
         authenticate(config.get('db', 'host'), config.get('db', 'username'), config.get('db', 'password'))
         self.graph = Graph()
         self.events = events
+        self.port = int(config.get('db', 'com_port'))
 
     def is_unique_entry(self, entry):
         result = self.graph.find_one('entry', 'clean_url', entry.clean_url)

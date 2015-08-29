@@ -13,15 +13,18 @@
 # You should have received a copy of the GNU General Public License
 # along with Switcharoo.  If not, see <http://www.gnu.org/licenses/>.
 
-from socket import socket
+import socket
 
-
-def clear_cache():
-    client = socket()
-    client.connect(('localhost', 5891))
-    client.send('clear')
-    data = client.recv(32)
-    status = data.strip() == 'cleared'
-    client.close()
+def clear_cache(port):
+    status = False
+    try:
+        client = socket.socket()
+        client.connect(('localhost', port))
+        client.send('clear')
+        data = client.recv(32)
+        status = data.strip() == 'cleared'
+        client.close()
+    except socket.error:
+        pass
     return status
 

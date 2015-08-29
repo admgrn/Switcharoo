@@ -27,6 +27,7 @@ class GraphBuilder:
         self._graph = Graph()
         self.port = int(config.get('local', 'port'))
         self.auth = config.get('local', 'auth')
+        self.com_port = int(config.get('local', 'com_port'))
 
     @staticmethod
     def _build_key(relation):

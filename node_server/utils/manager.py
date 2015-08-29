@@ -17,17 +17,18 @@ from socket import socket
 from threading import Thread
 
 class CacheManager:
-    def __init__(self, fn):
+    def __init__(self, fn, port):
         self.fn = fn
         self.server = None
         self.t = None
+        self.port = port
 
     def _reload_cache(self):
         self.fn()
 
     def _loop(self):
         self.server = socket()
-        self.server.bind(('localhost', 5891))
+        self.server.bind(('localhost', self.port))
         self.server.listen(1)
         while 1:
             connection, address = self.server.accept()

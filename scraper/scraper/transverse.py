@@ -28,6 +28,7 @@ class Transverse:
         self.queue = None
         self.data = Access(self.events)
         self.source = Source(self)
+        self.port = self.data.port
         self._should_stop = False
 
     def init_queue(self):
