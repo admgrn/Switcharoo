@@ -16,7 +16,7 @@
     display: block;
 }
 .nav-position {
-    position: fixed;
+    position: absolute;
     width: 100%;
 }
 .nav-padding {
