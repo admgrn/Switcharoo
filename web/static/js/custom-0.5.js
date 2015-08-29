@@ -63,7 +63,7 @@ function showInfo(params, callback, updateState) {
                             .attr('href', 'javascript:void(0)');
                     $('#created-date').text('Submitted: ' + getTime(data.date));
                     if (updateState)
-                        state('/location/' + data.id, true);
+                        state('/location/' + data.id, data.id, true);
                     callback(true);
                 } else {
                     if (updateState)
