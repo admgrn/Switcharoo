@@ -19,24 +19,22 @@ from multiprocessing.managers import BaseManager
 from utils.generator import GraphBuilder
 from utils.manager import CacheManager
 
-def main():
-    gb = GraphBuilder('./config.ini')
-    graph = gb.get_data()
+gb = GraphBuilder('./config.ini')
+graph = gb.get_data()
 
-    def get_cache():
-        return graph
+def get_cache():
+    global graph
+    return graph
 
-    def reload_cache():
-        global graph
-        temp = gb.get_data()
-        print "Reloading Cache..."
-        graph = temp
+def reload_cache():
+    global graph
+    temp = gb.get_data()
+    print "Reloading Cache..."
+    graph = temp
 
-    cache_loader = CacheManager(reload_cache)
-    cache_loader.run()
-    manager = BaseManager(address=('', gb.port), authkey=gb.auth)
-    manager.register('get_cache', callable=get_cache, exposed=('__getitem__',))
-    print "Launching Server..."
-    manager.get_server().serve_forever()
-
-main()
+cache_loader = CacheManager(reload_cache)
+cache_loader.run()
+manager = BaseManager(address=('', gb.port), authkey=gb.auth)
+manager.register('get_cache', callable=get_cache, exposed=('__getitem__',))
+print "Launching Server..."
+manager.get_server().serve_forever()

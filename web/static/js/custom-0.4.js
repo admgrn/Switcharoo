@@ -22,6 +22,9 @@ var FormSuccess = {
         $(location).css('display', '');
     }
 };
+function hideMainLoading() {
+    $('#loading-main').hide();
+}
 function decodeHtml(html) {
     var txt = document.createElement("textarea");
     txt.innerHTML = html;
@@ -40,27 +43,34 @@ function state(location, id, replace) {
     else
         history.replaceState({loc: location, id: id}, '', location);
 }
-function showInfo(params, updateState) {
+function showInfo(params, callback, updateState) {
     var id = typeof params === 'number' ? params : params.nodes[0];
     ContentLoading.show();
     $.ajax('/get_info/' + id)
             .done(function (data) {
-                $('#selected-info').text(data.title);
-                $('#selected-link').attr('href', data.link);
-                $('#selected-html').html(decodeHtml(data.html));
-                $('#selected-html a[href]').attr('target', '_blank');
-                if (data.user !== null)
-                    $('#username').text('/u/' + data.user)
-                                  .css('font-style', '')
-                                  .attr('href', 'https://reddit.com/u/' + data.user);
-                else
-                    $('#username').text('[deleted]')
-                                  .css('font-style', 'italic')
-                                  .attr('href', 'javascript:void(0)');
-                $('#created-date').text('Submitted: ' + getTime(data.date));
+                if (data.success) {
+                    $('#selected-info').text(data.title);
+                    $('#selected-link').attr('href', data.link);
+                    $('#selected-html').html(decodeHtml(data.html));
+                    $('#selected-html a[href]').attr('target', '_blank');
+                    if (data.user !== null)
+                        $('#username').text('/u/' + data.user)
+                            .css('font-style', '')
+                            .attr('href', 'https://reddit.com/u/' + data.user);
+                    else
+                        $('#username').text('[deleted]')
+                            .css('font-style', 'italic')
+                            .attr('href', 'javascript:void(0)');
+                    $('#created-date').text('Submitted: ' + getTime(data.date));
+                    if (updateState)
+                        state('/location/' + data.id, true);
+                    callback(true);
+                } else {
+                    if (updateState)
+                        state('/');
+                    callback(false);
+                }
                 ContentLoading.hide();
-                if (updateState)
-                    state('/location/' + data.id, data.id);
             });
     UIkit.offcanvas.show('#left-canvas');
 }
@@ -128,17 +138,18 @@ $(function () {
             push = true;
     });
     $(window).on('popstate', function (e) {
-        if (e.originalEvent.state.id) {
+        if (e.originalEvent.state !== null && e.originalEvent.state.id) {
             var id = parseInt(e.originalEvent.state.id);
-            showInfo(id);
-            network.selectNodes([id], true);
-            network.focus(id, {
-                animation: {
-                    duration: 200
-                },
-                offset: {
-                    x: -offset
-                }
+            showInfo(id, function () {
+                network.selectNodes([id], true);
+                network.focus(id, {
+                    animation: {
+                        duration: 200
+                    },
+                    offset: {
+                        x: -offset
+                    }
+                });
             });
         } else {
             push = false;

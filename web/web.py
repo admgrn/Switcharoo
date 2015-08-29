@@ -29,9 +29,13 @@ def load_content():
 
 @app.route('/get_info/<ident>')
 def get_info(ident):
-    node = graph.cypher.execute('MATCH (a:node) WHERE id(a) = {ID} RETURN a', ID=int(ident))[0]
-    return jsonify(title=node['a']['title'], link=node['a']['raw_url'], html=node['a']['html'],
-                   user=node['a']['user'], date=node['a']['created_utc'], id=ident)
+    try:
+        node = graph.cypher.execute('MATCH (a:node) WHERE id(a) = {ID} RETURN a', ID=int(ident))[0]
+    except IndexError:
+        return jsonify(success=0)
+    else:
+        return jsonify(success=1, title=node['a']['title'], link=node['a']['raw_url'], html=node['a']['html'],
+                       user=node['a']['user'], date=node['a']['created_utc'], id=ident)
 
 
 @app.route(app.config['CONTACT_URL'], methods=('POST',))

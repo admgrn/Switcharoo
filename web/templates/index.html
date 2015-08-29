@@ -12,13 +12,13 @@
         </script>
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link href="{{ url_for('static', filename='components/dist/vis.min.css') }}" rel="stylesheet" type="text/css" />
-        <link href="{{ url_for('static', filename='css/custom-0.3.css') }}" rel="stylesheet" type="text/css" />
+        <link href="{{ url_for('static', filename='css/custom-0.4.css') }}" rel="stylesheet" type="text/css" />
         <link href="{{ url_for('static', filename='css/uikit.css') }}" rel="stylesheet" type="text/css" />
         <script src="{{ url_for('static', filename='js/jquery-2.1.4.min.js') }}"></script>
         <script src="{{ url_for('static', filename='js/uikit.min.js') }}"></script>
         <script src="{{ url_for('static', filename='js/moment.min.js') }}"></script>
         <script src="{{ url_for('static', filename='js/jquery.validate.min.js') }}"></script>
-        <script src="{{ url_for('static', filename='js/custom-0.3.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/custom-0.4.js') }}"></script>
         <script src="{{ url_for('static', filename='components/dist/vis.min.js') }}"></script>
         <meta charset="UTF-8">
         <title>RooGraph - Beta</title>
@@ -216,37 +216,49 @@
             };
             var network = new vis.Network(container, data, options);
             network.on('selectNode', function (e) {
-                showInfo(e, true);
-                network.selectNodes([e.nodes[0]], true);
-                network.focus(e.nodes[0], {
-                    animation: {
-                        duration: 200
-                    },
-                    offset: {
-                        x: -offset
+                showInfo(e, function (success) {
+                    if (success) {
+                        network.selectNodes([e.nodes[0]], true);
+                        network.focus(e.nodes[0], {
+                            animation: {
+                                duration: 200
+                            },
+                            offset: {
+                                x: -offset
+                            }
+                        });
                     }
-                });
+                }, true);
             });
             $(window).load(function () {
                 $.ajax('/load_content')
                     .done(function (content) {
-                            nodes.add(content['nodes']);
-                            edges.add(content['relations']);
                             var id;
                             if ((id = checkUrl()) !== null) {
-                                showInfo(id);
-                                state('/location/' + id, id, true);
-                                network.selectNodes([id], true);
-                                network.focus(id,  {
-                                    offset: {
-                                        x: -offset
+                                showInfo(id, function (success) {
+                                    nodes.add(content['nodes']);
+                                    edges.add(content['relations']);
+                                    if (success) {
+                                        state('/location/' + id, id, true);
+                                        network.selectNodes([id], true);
+                                        network.focus(id, {
+                                            offset: {
+                                                x: -offset
+                                            }
+                                        });
+                                    } else {
+                                        state('/', null, true);
+                                        network.fit();
                                     }
+                                    hideMainLoading();
                                 });
                             } else {
+                                nodes.add(content['nodes']);
+                                edges.add(content['relations']);
                                 state('/', null, true);
                                 network.fit();
+                                hideMainLoading();
                             }
-                            $('#loading-main').hide()
                     });
             });
         </script>

@@ -40,7 +40,6 @@ class CacheManager:
     def run(self):
         self.t = Thread(target=self._loop)
         self.t.start()
-
     def kill(self):
         if self.server:
             self.server.close()
