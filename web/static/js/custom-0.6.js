@@ -1,4 +1,6 @@
 var push = true;
+var offset = 350 / 2;
+
 var ContentLoading = {
     show: function () {
         $('#loading-content').show();
@@ -9,7 +11,6 @@ var ContentLoading = {
         $('#selected-content').show();
     }
 };
-var offset = 350 / 2;
 var FormSuccess = {
     show: function (location) {
         $('.submit-success-' + $(location).find('input[name=type]').val()).css('display','');
@@ -63,7 +64,7 @@ function showInfo(params, callback, updateState) {
                             .attr('href', 'javascript:void(0)');
                     $('#created-date').text('Submitted: ' + getTime(data.date));
                     if (updateState)
-                        state('/location/' + data.id, data.id, true);
+                        state('/location/' + data.id, data.id);
                     callback(true);
                 } else {
                     if (updateState)
@@ -80,7 +81,104 @@ function checkUrl() {
         id = parseInt(id[1]);
     return id;
 }
+
 $(function () {
+    // Create network
+    var nodes = new vis.DataSet();
+    var edges = new vis.DataSet();
+    var container = document.getElementById('graph-navigator');
+    var data = {
+        nodes: nodes,
+        edges: edges
+    };
+    var options = {
+        edges: {
+            arrows: {
+                to: {
+                    enabled: true,
+                    scaleFactor: 2.5
+                }
+            },
+            smooth: {
+                enabled: false
+            },
+            color: 'rgb(100,100,100)'
+        },
+        nodes: {
+            borderWidth: 0.8,
+            shape: 'circle',
+            font: {
+                size: 50
+            },
+            scaling : {
+                min: 300
+            }
+        },
+        layout: {
+            randomSeed: 1
+        },
+        physics: {
+            enabled: true,
+            stabilization: false,
+            barnesHut: {
+                centralGravity: 0,
+                springConstant: 0,
+                springLength: 0,
+                avoidOverlap: 1,
+                damping: 0.3
+            }
+        }
+    };
+
+    var network = new vis.Network(container, data, options);
+    network.on('selectNode', function (e) {
+        showInfo(e, function (success) {
+            if (success) {
+                network.selectNodes([e.nodes[0]], true);
+                network.focus(e.nodes[0], {
+                    animation: {
+                        duration: 200
+                    },
+                    offset: {
+                        x: -offset
+                    }
+                });
+            }
+        }, true);
+    });
+
+    // Load content
+    $.ajax('/load_content')
+        .done(function (content) {
+                var id;
+                if ((id = checkUrl()) !== null) {
+                    showInfo(id, function (success) {
+                        nodes.add(content['nodes']);
+                        edges.add(content['relations']);
+                        if (success) {
+                            state('/location/' + id, id, true);
+                            network.selectNodes([id], true);
+                            network.focus(id, {
+                                offset: {
+                                    x: -offset
+                                }
+                            });
+                        } else {
+                            state('/location/' + id, id, true);
+                            network.fit();
+                        }
+                        hideMainLoading();
+                    });
+                } else {
+                    nodes.add(content['nodes']);
+                    edges.add(content['relations']);
+                    state('/', null, true);
+                    network.fit();
+                    hideMainLoading();
+                }
+        });
+
+    // Set Validations
     $('.async-form').each(function () {
         $(this).validate({
             rules: {
@@ -119,6 +217,8 @@ $(function () {
             }
         });
     });
+
+    // Event handlers
     $('.uk-modal').on('hide.uk.modal', function () {
         $(this).find('[id^=display-error-]').css('display', 'none');
         FormSuccess.hide($(this).find('.async-form'));
@@ -138,18 +238,20 @@ $(function () {
             push = true;
     });
     $(window).on('popstate', function (e) {
-        if (e.originalEvent.state !== null && e.originalEvent.state.id) {
+        if (e.originalEvent.state.id) {
             var id = parseInt(e.originalEvent.state.id);
-            showInfo(id, function () {
-                network.selectNodes([id], true);
-                network.focus(id, {
-                    animation: {
-                        duration: 200
-                    },
-                    offset: {
-                        x: -offset
-                    }
-                });
+            showInfo(id, function (success) {
+                if (success) {
+                    network.selectNodes([id], true);
+                    network.focus(id, {
+                        animation: {
+                            duration: 200
+                        },
+                        offset: {
+                            x: -offset
+                        }
+                    });
+                }
             });
         } else {
             push = false;
