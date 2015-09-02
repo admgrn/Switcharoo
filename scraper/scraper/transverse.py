@@ -67,4 +67,4 @@ class Transverse:
             current_entry = self.source.add_to_queue(limit, sleep)
             if self.build_graph(current_entry):
                 self.events.on_clearing_cache()
-                clear_cache()
+                clear_cache(self.port)

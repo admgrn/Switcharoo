@@ -22,9 +22,11 @@ class EventsBase(object):
         print 'Node exists'
 
     def on_adding_to_queue(self, url):
+        url = url.encode('utf-8')
         print 'Adding ' + url + ' to queue.'
 
     def on_not_adding_to_queue(self, url):
+        url = url.encode('utf-8')
         print 'Skipping ' + url + ' not adding to queue.'
 
     def waiting(self, seconds):

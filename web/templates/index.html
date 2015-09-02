@@ -12,13 +12,13 @@
         </script>
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link href="{{ url_for('static', filename='components/dist/vis.min.css') }}" rel="stylesheet" type="text/css" />
-        <link href="{{ url_for('static', filename='css/custom-0.6.css') }}" rel="stylesheet" type="text/css" />
+        <link href="{{ url_for('static', filename='css/custom-0.7.css') }}" rel="stylesheet" type="text/css" />
         <link href="{{ url_for('static', filename='css/uikit.css') }}" rel="stylesheet" type="text/css" />
         <script src="{{ url_for('static', filename='js/jquery-2.1.4.min.js') }}"></script>
         <script src="{{ url_for('static', filename='js/uikit.min.js') }}"></script>
         <script src="{{ url_for('static', filename='js/moment.min.js') }}"></script>
         <script src="{{ url_for('static', filename='js/jquery.validate.min.js') }}"></script>
-        <script src="{{ url_for('static', filename='js/custom-0.6.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/custom-0.7.js') }}"></script>
         <script src="{{ url_for('static', filename='components/dist/vis.min.js') }}"></script>
         <meta charset="UTF-8">
         <title>RooGraph - Beta</title>
@@ -62,12 +62,16 @@
                             </li>
                         </ul>
                     </div>
-                    <div class="uk-navbar-brand uk-navbar-center">
-                        RooGraph <sup class="uk-text-small">beta</sup>
+                    <div class="uk-navbar-brand uk-navbar-center uk-text-nowrap">
+                        RooGraph
                     </div>
                 </div>
             </nav>
             <div id="graph-navigator" class="uk-height-1-1 nav-padding"></div>
+        </div>
+        <div id="zoom">
+            <div class="zoom-control" id="zoom-in">+</div>
+            <div class="zoom-control" id="zoom-out">-</div>
         </div>
         <div class="uk-align-right uk-container uk-text-small uk-text-muted uk-hidden-small uk-position-bottom-right">
             {{ copyright | safe }}

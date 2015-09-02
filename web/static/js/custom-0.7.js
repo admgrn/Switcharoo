@@ -1,5 +1,7 @@
-var push = true;
-var offset = 350 / 2;
+var push     = true;
+var offset   = 350 / 2;
+var maxScale = 1;
+var minScale = 0.004;
 
 var ContentLoading = {
     show: function () {
@@ -236,6 +238,31 @@ $(function () {
             state('/');
         else
             push = true;
+    });
+    $('#zoom-in').on('click', function () {
+        var newScale = network.getScale() * 2;
+        if (newScale <= maxScale) {
+            network.moveTo({
+                scale: newScale,
+                animation: {
+                    duration: 100,
+                    easingFunction: "linear"
+                }
+            });
+        }
+    });
+    $('#zoom-out').on('click', function () {
+        var newScale = network.getScale() * 2;
+        if (newScale >= minScale) {
+            network.moveTo({
+                scale: network.getScale() / 2,
+                easingFunction: "linear",
+                animation: {
+                    duration: 100,
+                    easingFunction: "linear"
+                }
+            });
+        }
     });
     $(window).on('popstate', function (e) {
         if (e.originalEvent.state.id) {
