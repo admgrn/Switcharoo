@@ -129,6 +129,10 @@ $(function () {
                 avoidOverlap: 1,
                 damping: 0.3
             }
+        },
+        interaction: {
+            maxZoom: maxScale,
+            minZoom: minScale
         }
     };
 
@@ -252,11 +256,10 @@ $(function () {
         }
     });
     $('#zoom-out').on('click', function () {
-        var newScale = network.getScale() * 2;
+        var newScale = network.getScale() / 2;
         if (newScale >= minScale) {
             network.moveTo({
-                scale: network.getScale() / 2,
-                easingFunction: "linear",
+                scale: newScale,
                 animation: {
                     duration: 100,
                     easingFunction: "linear"
