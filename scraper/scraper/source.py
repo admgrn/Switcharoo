@@ -24,14 +24,14 @@ class Source:
         self.t = transverse
 
     def get_new_submissions(self, limit=10):
-        bad_flairs = ('meta', 'Reported faulty')
+        bad_flairs = ('meta post', 'Reported faulty')
         size = self.t.queue.qsize()
         submissions = self.t.reddit.get_subreddit('switcharoo').get_hot(limit=limit)
         for submission in submissions:
             if submission.link_flair_text not in bad_flairs:
                 self.t.queue.put(submission.url)
             else:
-                self.t.events.on_skipping_url(submission.url)
+                self.t.events.on_not_adding_to_queue(submission.url)
         return self.t.queue.qsize() > size
 
     def add_to_queue(self, limit, sleep=10):
