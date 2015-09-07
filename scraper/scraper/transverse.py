@@ -18,17 +18,20 @@ import praw
 from data import Access
 from entryqueue import EntryQueue
 from manage.cache import clear_cache
+from manage.config import Conf
 from source import Source
 
 
 class Transverse:
     def __init__(self, events):
-        self.reddit = praw.Reddit(user_agent='Switcharoo Cartographer v.0.1.1')
+        config = Conf()
+        self.reddit = praw.Reddit(user_agent='Switcharoo Cartographer v.0.2.1')
+        self.reddit.login(config.r_username, config.r_password, disable_warning=True)
         self.events = events
         self.queue = None
         self.data = Access(self.events)
         self.source = Source(self)
-        self.port = self.data.port
+        self.port = config.com_port
         self._should_stop = False
 
     def init_queue(self):

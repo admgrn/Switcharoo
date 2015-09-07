@@ -23,9 +23,10 @@ events = EventsBase()
 data = Access(events)
 
 # Submission ID
-nodes = data.graph.cypher.execute('MATCH (a:node) WHERE NOT HAS(a.submission_id) RETURN a').to_subgraph().nodes
+nodes = data.graph.cypher.execute('MATCH (a:node) RETURN a').to_subgraph().nodes
 for node in nodes:
-    comment = r.get_submission(node['clean_url'][:-1] + '?context=' + str(node['context'])).comments[0]
-    node['submission_id'] = comment.submission.fullname
+    print node['clean_url']
+    node['clean_url'] = node['clean_url'].replace('http://', 'https://', 1)
+    print "  => " + node['clean_url']
     node.push()
 

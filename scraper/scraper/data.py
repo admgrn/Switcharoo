@@ -13,9 +13,9 @@
 # You should have received a copy of the GNU General Public License
 # along with Switcharoo Cartographer.  If not, see <http://www.gnu.org/licenses/>.
 
-import ConfigParser
 import re
 
+from manage.config import Conf
 from py2neo import authenticate, Graph, Node, Relationship
 
 
@@ -56,13 +56,11 @@ def transverse_tree(comments):
 
 
 class Access:
-    def __init__(self, events, config_file='./config.ini'):
-        config = ConfigParser.ConfigParser()
-        config.read(config_file)
-        authenticate(config.get('db', 'host'), config.get('db', 'username'), config.get('db', 'password'))
+    def __init__(self, events):
+        config = Conf()
+        authenticate(config.db_host, config.db_username, config.db_password)
         self.graph = Graph()
         self.events = events
-        self.port = int(config.get('db', 'com_port'))
 
     def is_unique_entry(self, entry):
         result = self.graph.find_one('entry', 'clean_url', entry.clean_url)
@@ -149,7 +147,7 @@ class Entry:
             self.reddit = reddit
             if len(re.findall(r'.*reddit.com/.*comments/.*', url)) <= 0:
                 raise EntryError()
-            fixed_url = re.sub(r'(^https?://(www.)?)', 'http://www.', url)
+            fixed_url = re.sub(r'(^https?://(www.)?)', 'https://www.', url)
             clean = re.findall(r'.*?(?=\?|/\?|/$|$)', fixed_url)
             context = re.findall(r'(?<=\?context=)\d+', fixed_url)
             self.raw_url = url
