@@ -30,3 +30,10 @@ for node in nodes:
     print "  => " + node['clean_url']
     node.push()
 
+nodes = data.graph.cypher.execute('MATCH (a:entry) RETURN a').to_subgraph().nodes
+for node in nodes:
+    print node['clean_url']
+    node['clean_url'] = node['clean_url'].replace('http://', 'https://', 1)
+    print "  => " + node['clean_url']
+    node.push()
+
