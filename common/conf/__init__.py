@@ -12,17 +12,3 @@
 
 # You should have received a copy of the GNU General Public License
 # along with Switcharoo.  If not, see <http://www.gnu.org/licenses/>.
-
-import ConfigParser
-from conf.configuration import get_config_file
-
-class Conf:
-    def __init__(self):
-        config = ConfigParser.ConfigParser()
-        config.read(get_config_file('config_scraper.ini'))
-        self.db_host = config.get('db', 'host')
-        self.db_username = config.get('db', 'username')
-        self.db_password = config.get('db', 'password')
-        self.com_port = int(config.get('db', 'com_port'))
-        self.r_username = config.get('reddit', 'username')
-        self.r_password = config.get('reddit', 'password')
