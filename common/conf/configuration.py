@@ -24,6 +24,3 @@ def get_config_file(filename=None, env='CONFLOC'):
     if filename and not re.search('\.ini$', location):
         location = os.path.join(location, filename)
     return location
-
-
-print get_config_file(filename='hello.ini')
