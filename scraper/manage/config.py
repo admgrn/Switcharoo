@@ -23,6 +23,8 @@ class Conf:
         self.db_host = config.get('db', 'host')
         self.db_username = config.get('db', 'username')
         self.db_password = config.get('db', 'password')
+        self.auth = config.get('db', 'auth')
+        self.share_port = int(config.get('db', 'share_port'))
         self.com_port = int(config.get('db', 'com_port'))
         self.r_username = config.get('reddit', 'username')
         self.r_password = config.get('reddit', 'password')

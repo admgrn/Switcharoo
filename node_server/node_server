@@ -19,22 +19,48 @@ from multiprocessing.managers import BaseManager
 from utils.generator import GraphBuilder
 from utils.manager import CacheManager
 
-gb = GraphBuilder('./config.ini')
-graph = gb.get_data()
+def create_meta_data():
+    global graph
+    global meta
+    global max_dist
+    temp = {}
+    maximum = 0
+    data = graph[0]
+    for i in data:
+        distance = int(i['label'])
+        temp[i['id']] = distance
+        if distance > maximum:
+            maximum = distance
+    meta = temp
+    max_dist = maximum
 
 def get_cache():
     global graph
     return graph
+
+def get_meta_data():
+    global meta
+    global max_dist
+    return (meta, max_dist)
 
 def reload_cache():
     global graph
     temp = gb.get_data()
     print "Reloading Cache..."
     graph = temp
+    print "Reloaded"
+    print "Creating Meta Data..."
+    create_meta_data()
+    print "Meta Data Created"
+
+
+gb = GraphBuilder('./config.ini')
+reload_cache()
 
 cache_loader = CacheManager(reload_cache, gb.com_port)
 cache_loader.run()
 manager = BaseManager(address=('', gb.port), authkey=gb.auth)
 manager.register('get_cache', callable=get_cache, exposed=('__getitem__',))
+manager.register('get_meta_data', callable=get_meta_data, exposed=('__getitem__',))
 print "Launching Server..."
 manager.get_server().serve_forever()

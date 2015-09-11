@@ -68,8 +68,8 @@ class GraphBuilder:
 
     def get_data(self):
         found_paths = self._graph.cypher.execute('match p=(b:node)<-[:linksTo*]-(a:node) where not ()-[:linksTo]->(a) and '
-                                            'not (b)-[:linksTo]->() with p, nodes(p) as items return length(items) '
-                                           'as le, extract(n in items|id(n)) as id order by le desc').records
+                                                 'not (b)-[:linksTo]->() with p, nodes(p) as items return length(items) '
+                                                 'as le, extract(n in items|id(n)) as id order by le desc').records
         relations = {}
         nodes = {}
         position = self.Position()

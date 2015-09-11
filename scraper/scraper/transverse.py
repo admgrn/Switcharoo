@@ -21,6 +21,8 @@ from manage.cache import clear_cache
 from manage.config import Conf
 from source import Source
 
+from multiprocessing.managers import BaseManager
+
 
 class Transverse:
     def __init__(self, events):
@@ -31,8 +33,11 @@ class Transverse:
         self.queue = None
         self.data = Access(self.events)
         self.source = Source(self)
-        self.port = config.com_port
+        self._port = config.com_port
+        self._share_port = config.share_port
+        self._auth = config.auth
         self._should_stop = False
+        self._threshold = 10
 
     def init_queue(self):
         if self.queue is None:
@@ -42,20 +47,19 @@ class Transverse:
         entry_point = True
         stop = False
         found = False
+        found_list = []
         while current_entry is not None and not stop:
             current_entry.set_next()
             if current_entry.next_entry is None and entry_point:
                 self.source.mark_searched(current_entry)
-                return
+                return found, found_list
             entry_point = False
             # Check if item is already in graph
             node, stop = self.data.is_new_node(current_entry)
-            if node is None:
-                self.source.mark_searched(current_entry)
-                return
             # New node
             if not stop:
                 found = True
+                found_list.append(node)
             parents = self.data.get_parents(current_entry)
             for parent in parents:
                 created = self.data.add_link(parent, node)
@@ -63,11 +67,29 @@ class Transverse:
                     found = True
             self.source.mark_searched(current_entry)
             current_entry = current_entry.next_entry
-        return found
+        return found, found_list
+
+    def analyze_found(self, list):
+        if len(list) > 0:
+            manager = BaseManager(address=('', self._share_port), authkey=self._auth)
+            manager.register('get_meta_data')
+            manager.connect()
+            distances, max_dist = manager.get_meta_data()
+            for n in list:
+                try:
+                    if max_dist - distances[n._id] > self._threshold:
+                        # Do something here
+                        print "*** Node " + str(n._id) + " hit the threshold"
+                except KeyError:
+                    # Do query here to see if node exists. If it does than node
+                    # does not link to origin
+                    print "*** Node " + str(n._id) + "may not link to origin"
 
     def loop(self, limit, sleep=10):
         while 1:
             current_entry = self.source.add_to_queue(limit, sleep)
-            if self.build_graph(current_entry):
+            found, found_list = self.build_graph(current_entry)
+            if found:
                 self.events.on_clearing_cache()
-                clear_cache(self.port)
+                clear_cache(self._port)
+                self.analyze_found(found_list)
