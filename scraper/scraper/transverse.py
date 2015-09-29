@@ -83,7 +83,7 @@ class Transverse:
                 except KeyError:
                     # Do query here to see if node exists. If it does than node
                     # does not link to origin
-                    print "*** Node " + str(n._id) + "may not link to origin"
+                    print "*** Node " + str(n._id) + " may not link to origin"
 
     def loop(self, limit, sleep=10):
         while 1:

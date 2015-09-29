@@ -18,6 +18,7 @@
 from sys import argv
 
 from manage import cache
+from manage.config import Conf
 from scraper.console import ConsoleManager
 from scraper.events import EventsBase
 from scraper.reconnect import Connections
@@ -67,7 +68,7 @@ def scrape(limit=10, sleep=600):
 @manager.register('clear_cache', 'usage: clear_cache')
 def clear_cache():
     print 'Clearing'
-    if cache.clear_cache(transverse.port):
+    if cache.clear_cache(Conf().com_port):
         print 'Success'
     else:
         print 'Unsuccessful'
